@@ -11,8 +11,9 @@
     shell: /bin/bash
     home: /home/{{ user_name }}
     create_home: true
+    group: "{{ user_group }}"
     groups:
-      - "{{ user_group }}"
+      - sudo
     state: present
 
 - name: Create ssh directory

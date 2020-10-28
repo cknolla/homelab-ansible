@@ -1,8 +1,8 @@
 
-test-machines:
+test_machines:
   hosts:
     ubuntu-test.kansai:
 
 all:
   children:
-    test-machines:
+    test_machines:
