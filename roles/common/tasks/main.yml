@@ -1,0 +1,10 @@
+- name: Install vim
+  ansible.builtin.apt:
+    name: "vim"
+    state: present
+
+- name: Install htop
+  ansible.builtin.apt:
+    name: "htop"
+    state: present
+
