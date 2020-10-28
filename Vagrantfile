@@ -35,7 +35,7 @@ Vagrant.configure("2") do |config|
   # the path on the host to the actual folder. The second argument is
   # the path on the guest to mount the folder. And the optional third
   # argument is a set of non-required options.
-  config.vm.synced_folder ".", "/home/vagrant/vagrant-testing"
+  config.vm.synced_folder ".", "/home/vagrant/homelab-ansible"
   # Provider-specific configuration so you can fine-tune various
   # backing providers for Vagrant. These expose provider-specific options.
   # Example for VirtualBox:
@@ -55,10 +55,6 @@ Vagrant.configure("2") do |config|
   # documentation for more information about their specific syntax and use.
   config.vm.provision "shell", inline: <<-SHELL
     apt-get update
-    apt-get install -y python3-venv
-    python3 -m venv venv
-    source venv/bin/activate && \
-    pip install -r vagrant-testing/requirements.txt
-    chown -R vagrant:vagrant venv/
+    apt-get install ansible
   SHELL
 end

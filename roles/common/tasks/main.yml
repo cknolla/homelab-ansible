@@ -1,10 +1,86 @@
+# Create local user
+- name: Create casey group
+  group:
+    name: "{{ user_group }}"
+    state: present
+
+- name: Create casey user
+  user:
+    name: "{{ user_name }}"
+    system: true
+    shell: /bin/bash
+    home: /home/{{ user_name }}
+    create_home: true
+    groups:
+      - "{{ user_group }}"
+    state: present
+
+- name: Create ssh directory
+  file:
+    path: "/home/{{ user_name }}/.ssh"
+    state: "directory"
+    recurse: yes
+    owner: "{{ user_name }}"
+    group: "{{ user_group }}"
+    mode: 0700
+
+- name: Create authorized_keys file
+  file:
+    path: "/home/{{ user_name }}/.ssh/authorized_keys"
+    state: touch
+    owner: "{{ user_name }}"
+    group: "{{ user_group }}"
+    mode: 0600
+
+- name: Inject WSL SSH key
+  lineinfile:
+    path: "/home/{{ user_name }}/.ssh/authorized_keys"
+    line: "{{ wsl_pubkey }}"
+
+# Packages
+- name: apt update
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
 - name: Install vim
-  ansible.builtin.apt:
+  apt:
     name: "vim"
     state: present
 
 - name: Install htop
-  ansible.builtin.apt:
+  apt:
     name: "htop"
     state: present
+
+- name: Install curl
+  apt:
+    name: "curl"
+    state: present
+
+- name: Install jq
+  apt:
+    name: "jq"
+    state: present
+
+- name: Install ca-certificates package
+  apt:
+    name: "ca-certificates"
+    state: present
+
+- name: Create cert directory
+  file:
+    path: "{{ cert_path }}"
+    state: "directory"
+    recurse: yes
+    owner: "root"
+    group: "root"
+
+- name: Copy cert
+  copy:
+    src: "{{ cert_file }}"
+    dest: "{{ cert_path }}/{{ cert_file }}"
+  notify:
+    - update-ca-certificates
+
 
