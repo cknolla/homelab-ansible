@@ -1,32 +1,3 @@
-# Get vault token
-#- name: Vault auth
-#  uri:
-#    url: "{{ vault_addr }}/v1/auth/cert/login"
-#    method: POST
-#    client_cert: ansible.kansai.pem
-#    client_key: ansible.kansai.key
-#    body: "{ 'name': 'ansible' }"
-#    return_content: yes
-#  register: vault_token_response
-#
-#- name: Vault token verification
-#  debug:
-#    msg: "{{ vault_token_response.auth.client_token }}"
-#
-#- name: Get Vault secret
-#  uri:
-#    url: "{{ vault_addr }}/v1/kv/data/ansible"
-#    method: GET
-#    headers:
-#      X-Vault-Token: "{{ vault_token_response.auth.client_token }}"
-#    status_code: 200
-#    return_content: yes
-#  register: secret_response
-#
-#- name: Vault secret verification
-#  debug:
-#    msg: "{{ secret_response.data.data.data }}"
-
 # Create local user
 - name: Create casey group
   group:
@@ -45,6 +16,7 @@
       - sudo
     state: present
 
+# Inject client pubkeys
 - name: Create ssh directory
   file:
     path: "/home/{{ user_name }}/.ssh"
@@ -70,37 +42,30 @@
     - "{{ wsl_pubkey }}"
     - "{{ spectre_pubkey }}"
 
-#- name: Inject Spectre SSH key
-#  lineinfile:
-#    path: "/home/{{ user_name }}/.ssh/authorized_keys"
-#    line: "{{ spectre_pubkey }}"
+# Configure user environment as desired
+- name: Copy .bash-aliases
+  copy:
+    src: ".bash-aliases"
+    dest: "/home/{{ user_name }}/.bash-aliases"
 
-# Packages
+# Update + upgrade Ubuntu
 - name: apt update
   apt:
     update_cache: yes
     cache_valid_time: 3600
+    upgrade: dist
 
+# Install desired packages
 - name: Install vim
   apt:
-    name: "vim"
+    name:
+     - "vim"
+     - "htop"
+     - "curl"
+     - "jq"
     state: present
 
-- name: Install htop
-  apt:
-    name: "htop"
-    state: present
-
-- name: Install curl
-  apt:
-    name: "curl"
-    state: present
-
-- name: Install jq
-  apt:
-    name: "jq"
-    state: present
-
+# Prep for installing local root CA
 - name: Install ca-certificates package
   apt:
     name: "ca-certificates"
@@ -114,15 +79,12 @@
     owner: "root"
     group: "root"
 
+# Copy the root CA cert and update cert store so it is trusted
 - name: Copy cert
   copy:
     src: "{{ cert_file }}"
     dest: "{{ cert_path }}/{{ cert_file }}"
   notify:
     - update-ca-certificates
-
-- name: upgrade dist
-  apt:
-    upgrade: dist
 
 
