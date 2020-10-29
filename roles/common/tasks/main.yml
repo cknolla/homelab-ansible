@@ -43,10 +43,10 @@
     - "{{ spectre_pubkey }}"
 
 # Configure user environment as desired
-- name: Copy .bash-aliases
+- name: Copy .bash_aliases
   copy:
-    src: "bash-aliases"
-    dest: "/home/{{ user_name }}/.bash-aliases"
+    src: ".bash_aliases"
+    dest: "/home/{{ user_name }}/.bash_aliases"
 
 # Update + upgrade Ubuntu
 - name: apt update
