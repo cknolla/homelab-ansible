@@ -45,7 +45,7 @@
 # Configure user environment as desired
 - name: Copy .bash-aliases
   copy:
-    src: ".bash-aliases"
+    src: "bash-aliases"
     dest: "/home/{{ user_name }}/.bash-aliases"
 
 # Update + upgrade Ubuntu
