@@ -56,21 +56,17 @@
     upgrade: dist
 
 # Install desired packages
-- name: Install vim
+- name: Install packages
   apt:
     name:
      - "vim"
      - "htop"
      - "curl"
      - "jq"
+     - "ca-certificates"
     state: present
 
 # Prep for installing local root CA
-- name: Install ca-certificates package
-  apt:
-    name: "ca-certificates"
-    state: present
-
 - name: Create cert directory
   file:
     path: "{{ cert_path }}"
