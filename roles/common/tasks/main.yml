@@ -36,7 +36,7 @@
 - name: Create casey user
   user:
     name: "{{ user_name }}"
-    password: "{{ user_password }}"
+    password: "{{ user_password | password_hash('sha512', user_password_salt) }}"
     shell: /bin/bash
     home: "/home/{{ user_name }}"
     create_home: true
