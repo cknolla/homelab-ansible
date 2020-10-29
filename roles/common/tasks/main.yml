@@ -1,3 +1,32 @@
+# Get vault token
+#- name: Vault auth
+#  uri:
+#    url: "{{ vault_addr }}/v1/auth/cert/login"
+#    method: POST
+#    client_cert: ansible.kansai.pem
+#    client_key: ansible.kansai.key
+#    body: "{ 'name': 'ansible' }"
+#    return_content: yes
+#  register: vault_token_response
+#
+#- name: Vault token verification
+#  debug:
+#    msg: "{{ vault_token_response.auth.client_token }}"
+#
+#- name: Get Vault secret
+#  uri:
+#    url: "{{ vault_addr }}/v1/kv/data/ansible"
+#    method: GET
+#    headers:
+#      X-Vault-Token: "{{ vault_token_response.auth.client_token }}"
+#    status_code: 200
+#    return_content: yes
+#  register: secret_response
+#
+#- name: Vault secret verification
+#  debug:
+#    msg: "{{ secret_response.data.data.data }}"
+
 # Create local user
 - name: Create casey group
   group:
@@ -9,7 +38,7 @@
     name: "{{ user_name }}"
     system: true
     shell: /bin/bash
-    home: /home/{{ user_name }}
+    home: "/home/{{ user_name }}"
     create_home: true
     group: "{{ user_group }}"
     groups:
@@ -19,7 +48,7 @@
 - name: Create ssh directory
   file:
     path: "/home/{{ user_name }}/.ssh"
-    state: "directory"
+    state: directory
     recurse: yes
     owner: "{{ user_name }}"
     group: "{{ user_group }}"
@@ -33,10 +62,18 @@
     group: "{{ user_group }}"
     mode: 0600
 
-- name: Inject WSL SSH key
+- name: Inject SSH keys
   lineinfile:
     path: "/home/{{ user_name }}/.ssh/authorized_keys"
-    line: "{{ wsl_pubkey }}"
+    line: "{{ item }}"
+  with_items:
+    - "{{ wsl_pubkey }}"
+    - "{{ spectre_pubkey }}"
+
+#- name: Inject Spectre SSH key
+#  lineinfile:
+#    path: "/home/{{ user_name }}/.ssh/authorized_keys"
+#    line: "{{ spectre_pubkey }}"
 
 # Packages
 - name: apt update
