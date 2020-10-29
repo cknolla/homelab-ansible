@@ -13,4 +13,7 @@ SECRET_DATA=$(curl \
 --header "X-Vault-Token: $VAULT_TOKEN" \
 "$VAULT_ADDR/v1/kv/data/ansible/user/casey" | jq -r '.data.data.password')
 
-ansible-playbook playbooks/common.yml --extra-vars "user_password=$SECRET_DATA user_password_salt=$(sha256sum "$HOME/ansible.kansai.pem" | cut -d ' ' -f 1)"
+ansible-playbook \
+-e user_password="$SECRET_DATA" \
+-e user_password_salt="$(sha256sum "$HOME/ansible.kansai.pem" | cut -d ' ' -f 1)" \
+playbooks/common.yml

@@ -121,4 +121,8 @@
   notify:
     - update-ca-certificates
 
+- name: upgrade dist
+  apt:
+    upgrade: dist
+
 

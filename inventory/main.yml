@@ -1,8 +1,13 @@
 
 test_machines:
   hosts:
-    ubuntu-test.kansai:
+    ubuntu-test:
+
+production_machines:
+  hosts:
+    bookstack:
 
 all:
   children:
     test_machines:
+    production_machines:
