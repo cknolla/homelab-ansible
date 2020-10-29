@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+if [[ -z $1 ]]; then
+  echo "Must provide path to playbook" >&2
+fi
+
+PLAYBOOK=$1
+
 VAULT_TOKEN=$(curl \
 --silent \
 --request POST \
@@ -16,4 +22,4 @@ SECRET_DATA=$(curl \
 ansible-playbook \
 -e user_password="$SECRET_DATA" \
 -e user_password_salt="$(sha256sum "$HOME/ansible.kansai.pem" | cut -d ' ' -f 1)" \
-playbooks/common.yml
+"$PLAYBOOK"
