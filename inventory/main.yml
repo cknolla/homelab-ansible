@@ -1,17 +1,6 @@
 
 new_machines:
   hosts:
-    ansible:
-    bookstack:
-    gitea:
-    ombi:
-    nginx:
-    plex:
-    radarr:
-    sonarr:
-    tautulli:
-    unifi:
-    vault:
 
 test_machines:
   hosts:

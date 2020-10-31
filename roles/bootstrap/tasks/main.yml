@@ -10,7 +10,6 @@
     user: ansible
     state: present
     key: "{{ lookup('file', 'ansible.pub') }}"
-    exclusive: yes
 
 - name: Add sudoers file for ansible
   copy:
@@ -19,3 +18,4 @@
     owner: root
     group: root
     mode: 0440
+
