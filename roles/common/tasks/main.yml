@@ -47,9 +47,9 @@
     user: casey
     state: present
     key: {{ item }}
-  with_items:
-    - "{{ wsl_pubkey }}"
-    - "{{ spectre_pubkey }}"
+  with_files:
+    - "{{ wsl_pubkey_path }}"
+    - "{{ spectre_pop_pubkey_path }}"
 
 # Configure user environment as desired
 - name: Copy .bash_aliases
