@@ -24,3 +24,33 @@
   with_items:
     - "{{ wsl_pubkey }}"
     - "{{ spectre_pubkey }}"
+
+
+# Get vault token
+- name: Vault auth
+  uri:
+    url: "{{ vault_addr }}/v1/auth/cert/login"
+    method: POST
+    client_cert: ansible.kansai.pem
+    client_key: ansible.kansai.key
+    body: "{ 'name': 'ansible' }"
+    return_content: yes
+  register: vault_token_response
+
+- name: Vault token verification
+  debug:
+    msg: "{{ vault_token_response.auth.client_token }}"
+
+- name: Get Vault secret
+  uri:
+    url: "{{ vault_addr }}/v1/kv/data/ansible"
+    method: GET
+    headers:
+      X-Vault-Token: "{{ vault_token_response.auth.client_token }}"
+    status_code: 200
+    return_content: yes
+  register: secret_response
+
+- name: Vault secret verification
+  debug:
+    msg: "{{ secret_response.data.data.data }}"

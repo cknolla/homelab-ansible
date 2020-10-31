@@ -1,3 +1,0 @@
-- hosts: new_machines
-  roles:
-    - bootstrap
