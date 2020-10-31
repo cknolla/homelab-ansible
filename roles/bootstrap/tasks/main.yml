@@ -1,13 +1,8 @@
 - name: Create ansible user
   user:
-    name: "{{ user_name }}"
-    password: "{{ user_password | password_hash('sha512', user_password_salt) }}"
+    name: "ansible"
     shell: /bin/bash
-    home: "/home/{{ user_name }}"
-    create_home: true
-    group: "{{ user_group }}"
-    groups:
-      - sudo
+    create_home: yes
     state: present
 
 - name: Inject ansible SSH key
