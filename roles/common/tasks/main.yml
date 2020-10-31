@@ -46,8 +46,8 @@
   authorized_key:
     user: casey
     state: present
-    key: {{ item }}
-  with_files:
+    key: "{{ item }}"
+  with_file:
     - "{{ wsl_pubkey_path }}"
     - "{{ spectre_pop_pubkey_path }}"
 
