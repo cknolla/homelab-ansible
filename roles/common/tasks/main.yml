@@ -17,27 +17,36 @@
     state: present
 
 # Inject client pubkeys
-- name: Create ssh directory
-  file:
-    path: "/home/{{ user_name }}/.ssh"
-    state: directory
-    recurse: yes
-    owner: "{{ user_name }}"
-    group: "{{ user_group }}"
-    mode: 0700
+#- name: Create ssh directory
+#  file:
+#    path: "/home/{{ user_name }}/.ssh"
+#    state: directory
+#    recurse: yes
+#    owner: "{{ user_name }}"
+#    group: "{{ user_group }}"
+#    mode: 0700
+#
+#- name: Create authorized_keys file
+#  file:
+#    path: "/home/{{ user_name }}/.ssh/authorized_keys"
+#    state: touch
+#    owner: "{{ user_name }}"
+#    group: "{{ user_group }}"
+#    mode: 0600
 
-- name: Create authorized_keys file
-  file:
-    path: "/home/{{ user_name }}/.ssh/authorized_keys"
-    state: touch
-    owner: "{{ user_name }}"
-    group: "{{ user_group }}"
-    mode: 0600
+#- name: Inject SSH keys
+#  lineinfile:
+#    path: "/home/{{ user_name }}/.ssh/authorized_keys"
+#    line: "{{ item }}"
+#  with_items:
+#    - "{{ wsl_pubkey }}"
+#    - "{{ spectre_pubkey }}"
 
 - name: Inject SSH keys
-  lineinfile:
-    path: "/home/{{ user_name }}/.ssh/authorized_keys"
-    line: "{{ item }}"
+  authorized_key:
+    user: casey
+    state: present
+    key: {{ item }}
   with_items:
     - "{{ wsl_pubkey }}"
     - "{{ spectre_pubkey }}"
