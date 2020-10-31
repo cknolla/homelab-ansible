@@ -1,4 +1,8 @@
 
+new_machines:
+  hosts:
+    ubuntu-test:
+
 test_machines:
   hosts:
     ubuntu-test:
