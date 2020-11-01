@@ -3,18 +3,6 @@
     name: apache2
     state: present
 
-- name: Enable mod_rewrite
-  apache2_module:
-    name: rewrite
-    state: present
-  notify: restart_apache
-
-- name: Enable ssl
-  apache2_module:
-    name: ssl
-    state: present
-  notify: restart_apache
-
 - name: Inject site config
   template:
     src: apache.j2
@@ -22,14 +10,6 @@
     owner: root
     group: root
     mode: 0644
-
-- name: Enable site config
-  shell: /usr/sbin/a2ensite kansai-ssl.conf
-  notify: reload_apache
-
-- name: Disable default apache config
-  shell: /usr/sbin/a2dissite 000-default.conf
-  notify: reload_apache
 
 - name: Create ssl directory
   file:
@@ -62,3 +42,23 @@
     owner: root
     group: root
     mode: 0600
+
+- name: Enable mod_rewrite
+  apache2_module:
+    name: rewrite
+    state: present
+  notify: restart_apache
+
+- name: Enable ssl
+  apache2_module:
+    name: ssl
+    state: present
+  notify: restart_apache
+
+- name: Enable site config
+  shell: /usr/sbin/a2ensite kansai-ssl.conf
+  notify: reload_apache
+
+- name: Disable default apache config
+  shell: /usr/sbin/a2dissite 000-default.conf
+  notify: reload_apache
