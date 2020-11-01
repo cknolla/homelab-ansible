@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 
 if [[ -z $1 ]]; then
-  echo "Must provide path to playbook" >&2
+    PLAYBOOK="playbooks/homelab.yml"
+  else
+    PLAYBOOK=$1
 fi
 
-PLAYBOOK=$1
 DOMAIN=$(cat < "cert_config.json" | jq -r '.domain')
 VAULT_ADDR=$(cat < "cert_config.json" | jq -r '.vault_addr')
 
