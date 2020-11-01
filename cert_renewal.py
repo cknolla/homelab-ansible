@@ -78,7 +78,7 @@ def get_needs_renewed(server_name: str, cert_path: str) -> bool:
     x509 = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_PEM, cert_string)
     expiration_datetime = datetime.strptime(x509.get_notAfter().decode('utf-8'), r'%Y%m%d%H%M%SZ')
     ttl = expiration_datetime - datetime.utcnow()
-    if ttl < timedelta(days=30):
+    if ttl < timedelta(days=config['renewal_threshold_days']):
         LOGGER.info(f'{server_name} cert expires in {ttl}. Needs renewal')
         return True
     LOGGER.info(f'Skipping {server_name}. Cert expires in {ttl}.')

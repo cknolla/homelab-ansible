@@ -3,6 +3,7 @@
   "vault_addr": "https://vault.kansai:8200",
   "domain": "kansai",
   "ca_name": "kansaiCA.crt",
+  "renewal_threshold_days": 30,
   "servers": {
     "ansible": "certs",
     "bookstack": "roles/apache/files",
