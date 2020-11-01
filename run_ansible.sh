@@ -9,7 +9,7 @@ fi
 DOMAIN=$(cat < "cert_config.json" | jq -r '.domain')
 VAULT_ADDR=$(cat < "cert_config.json" | jq -r '.vault_addr')
 
-# rewnew certs with python script
+# renew certs with python script
 source venv/bin/activate && ./cert_renewal.py && deactivate
 
 VAULT_TOKEN=$(curl \
