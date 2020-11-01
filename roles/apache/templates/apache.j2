@@ -1,17 +1,17 @@
 <VirtualHost *:80>
-    ServerName {{ server_name }}
+    ServerName {{ inventory_hostname }}.{{ domain }}
     RewriteEngine On
     RewriteRule ^(.*)$ https://%{HTTP_HOST}$1 [R=301,L]
 </VirtualHost>
 
 <VirtualHost *:443>
-	ServerName {{ server_name }}
+	ServerName {{ inventory_hostname }}.{{ domain }}
 	ServerAdmin {{ email_address }}
 	DocumentRoot {{ document_root }}
 
     SSLEngine on
-    SSLCertificateFile      /etc/apache2/ssl/{{ cert_name}}
-    SSLCertificateKeyFile   /etc/apache2/ssl/private/{{ key_name }}
+    SSLCertificateFile      /etc/apache2/ssl/{{ inventory_hostname }}.{{ domain }}.pem
+    SSLCertificateKeyFile   /etc/apache2/ssl/private/{{ inventory_hostname }}.{{ domain }}.key
 
     <Directory {{ document_root }}>
         Options Indexes FollowSymLinks

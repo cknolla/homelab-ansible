@@ -30,3 +30,35 @@
 - name: Disable default apache config
   shell: /usr/sbin/a2dissite 000-default.conf
   notify: reload_apache
+
+- name: Create ssl directory
+  file:
+    path: "/etc/apache2/ssl"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Create private ssl directory
+  file:
+    path: "/etc/apache2/ssl/private"
+    state: directory
+    owner: root
+    group: root
+    mode: 0700
+
+- name: Copy cert
+  copy:
+    src: "{{ inventory_hostname }}.{{ domain }}.pem"
+    dest: "/etc/apache2/ssl/{{ inventory_hostname }}.{{ domain }}.pem"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Copy key
+  copy:
+    src: "{{ inventory_hostname }}.{{ domain }}.key"
+    dest: "/etc/apache2/ssl/private/{{ inventory_hostname }}.{{ domain }}.key"
+    owner: root
+    group: root
+    mode: 0600

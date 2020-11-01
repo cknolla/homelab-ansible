@@ -1,0 +1,8 @@
+{
+  "vault_addr": "https://vault.kansai:8200",
+  "domain": "kansai",
+  "ca_name": "kansaiCA.crt",
+  "servers": {
+    "ubuntu-test": "roles/apache/files"
+  }
+}
