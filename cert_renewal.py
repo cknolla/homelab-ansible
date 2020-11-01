@@ -79,7 +79,7 @@ if __name__ == '__main__':
     with open('cert_config.json') as config_file:
         config = json.load(config_file)
     session = requests.Session()
-    session.verify = f'certs/{config["ca_name"]}'
+    session.verify = f'roles/common/files/{config["ca_name"]}'
     print('Fetching vault token')
     vault_token = get_vault_token()
     session.headers = {
