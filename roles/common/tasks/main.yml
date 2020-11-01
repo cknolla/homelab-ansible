@@ -32,7 +32,7 @@
     dest: "/home/{{ user_name }}/.bash_aliases"
 
 # Update + upgrade Ubuntu
-- name: apt update
+- name: apt update + upgrade-dist
   apt:
     update_cache: yes
     cache_valid_time: 3600

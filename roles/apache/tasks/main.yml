@@ -62,7 +62,7 @@
   notify: reload_apache
 
 - name: Disable default apache config
-  command: /usr/sbin/a2dissite 000-default.conf
+  command: "/usr/sbin/a2dissite 000-default.conf"
   args:
     removes: "/etc/apache2/sites-enabled/000-default.conf"
   notify: reload_apache
