@@ -2,11 +2,32 @@
 import json
 import logging
 import os
-import sys
 from datetime import datetime, timedelta
 
 import requests
 import OpenSSL
+
+
+# set up logging to file - see previous section for more details
+logging.basicConfig(level=logging.DEBUG,
+                    format='%(asctime)s %(levelname)s - %(message)s',
+                    datefmt='%m-%d %H:%M',
+                    filename='logs/log.log',
+                    filemode='w')
+# define a Handler which writes INFO messages or higher to the sys.stderr
+_console = logging.StreamHandler()
+_console.setLevel(logging.INFO)
+# set a format which is simpler for console use
+_formatter = logging.Formatter('%(levelname)s - %(message)s')
+# tell the handler to use this format
+_console.setFormatter(_formatter)
+# add the handler to the root logger
+LOGGER = logging.getLogger(__name__)
+LOGGER.addHandler(_console)
+LOGGER.info('Loading config file cert_config.json')
+with open('cert_config.json') as config_file:
+    config = json.load(config_file)
+SESSION = requests.Session()
 
 
 def cert_to_string(cert_path) -> str:
@@ -17,7 +38,7 @@ def cert_to_string(cert_path) -> str:
     return cert_string
 
 def get_vault_token() -> str:
-    with session.post(
+    with SESSION.post(
         f'{config["vault_addr"]}/v1/auth/cert/login',
         cert=(
             f'certs/ansible.{config["domain"]}.pem',
@@ -28,24 +49,26 @@ def get_vault_token() -> str:
         return response_data['auth']['client_token']
 
 
-def get_needs_renewed(cert_path: str) -> bool:
+def get_needs_renewed(server_name: str, cert_path: str) -> bool:
     try:
         cert_string = cert_to_string(cert_path)
     except FileNotFoundError:
-        logger.info(f'No cert found for {server_name}')
+        LOGGER.info(f'No cert found for {server_name}')
         return True  # generate initial cert if none exists
     x509 = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_PEM, cert_string)
     expiration_datetime = datetime.strptime(x509.get_notAfter().decode('utf-8'), r'%Y%m%d%H%M%SZ')
     ttl = expiration_datetime - datetime.utcnow()
     if ttl < timedelta(days=30):
-        logger.info(f'{server_name} cert expires in {ttl}. Needs renewal')
+        LOGGER.info(f'{server_name} cert expires in {ttl}. Needs renewal')
         return True
-    logger.info(f'{server_name} cert expires in {ttl}. Does not need renewal')
+    LOGGER.info(f'{server_name} cert expires in {ttl}. Does not need renewal')
     return False
 
 
 def fetch_new_cert(server_name: str, output_path: str) -> None:
-    with session.post(
+    key_path = os.path.join(output_path, f'{server_name}.{config["domain"]}.key')
+    cert_path = os.path.join(output_path, f'{server_name}.{config["domain"]}.pem')
+    with SESSION.post(
         f'{config["vault_addr"]}/v1/pki/issue/kansai',
         json={
             'common_name': f'{server_name}.{config["domain"]}',
@@ -53,16 +76,18 @@ def fetch_new_cert(server_name: str, output_path: str) -> None:
         }
     ) as cert_response:
         cert_response_data = cert_response.json()
-        logger.info(f'Generating cert for {server_name} in {output_path}')
-        with open(os.path.join(output_path, f'{server_name}.{config["domain"]}.key'), 'w') as key_file:
+        LOGGER.info(f'Generating cert for {server_name} in {output_path}')
+        with open(key_path, 'w') as key_file:
             key_file.write(cert_response_data['data']['private_key'])
-        with open(os.path.join(output_path, f'{server_name}.{config["domain"]}.pem'), 'w') as pem_file:
+        os.chmod(key_path, 0o600)
+        with open(cert_path, 'w') as pem_file:
             cert_chain = [cert_response_data['data']['certificate']]
             cert_chain.extend(cert_response_data['data']['ca_chain'])
             pem_file.write('\n'.join(cert for cert in cert_chain))
+        os.chmod(cert_path, 0o644)
     if server_name == 'ansible':
-        logger.info('Updating vault cert for ansible')
-        with session.post(
+        LOGGER.info('Updating vault cert for ansible')
+        with SESSION.post(
             f'{config["vault_addr"]}/v1/auth/cert/certs/ansible',
             json={
                 'display_name': 'ansible',
@@ -72,43 +97,27 @@ def fetch_new_cert(server_name: str, output_path: str) -> None:
             }
         ) as ansible_cert_response:
             if ansible_cert_response.status_code != 204:
-                logger.error(f'Error updating ansible cert in vault!: {ansible_cert_response.json()}')
+                LOGGER.error(f'Error updating ansible cert in vault!: {ansible_cert_response.json()}')
             else:
-                logger.info(f'Successfully refreshed ansible cert for TLS auth in vault')
+                LOGGER.info(f'Successfully refreshed ansible cert for TLS auth in vault')
+
+
+def main():
+    vault_token = None
+    for server_name, output_path in config['servers'].items():
+        LOGGER.info(f'Checking if {server_name} cert needs renewed')
+        if get_needs_renewed(server_name, os.path.join(output_path, f'{server_name}.{config["domain"]}.pem')):
+            if vault_token is None:
+                SESSION.verify = f'roles/common/files/{config["ca_name"]}'
+                LOGGER.info('Fetching vault token')
+                vault_token = get_vault_token()
+                SESSION.headers = {
+                    'X-Vault-Token': vault_token,
+                }
+            LOGGER.info(f'Fetching new cert for {server_name}')
+            fetch_new_cert(server_name, output_path)
 
 
 if __name__ == '__main__':
+    main()
 
-    # set up logging to file - see previous section for more details
-    logging.basicConfig(level=logging.DEBUG,
-                        format='%(asctime)s %(levelname)s - %(message)s',
-                        datefmt='%m-%d %H:%M',
-                        filename='logs/log.log',
-                        filemode='w')
-    # define a Handler which writes INFO messages or higher to the sys.stderr
-    console = logging.StreamHandler()
-    console.setLevel(logging.INFO)
-    # set a format which is simpler for console use
-    formatter = logging.Formatter('%(levelname)s - %(message)s')
-    # tell the handler to use this format
-    console.setFormatter(formatter)
-    # add the handler to the root logger
-    logger = logging.getLogger(__name__)
-    logger.addHandler(console)
-    logger.info('Loading config file cert_config.json')
-    with open('cert_config.json') as config_file:
-        config = json.load(config_file)
-    session = requests.Session()
-    vault_token = None
-    for server_name, output_path in config['servers'].items():
-        logger.info(f'Checking if {server_name} cert needs renewed')
-        if get_needs_renewed(os.path.join(output_path, f'{server_name}.{config["domain"]}.pem')):
-            if vault_token is None:
-                session.verify = f'roles/common/files/{config["ca_name"]}'
-                logger.info('Fetching vault token')
-                vault_token = get_vault_token()
-                session.headers = {
-                    'X-Vault-Token': vault_token,
-                }
-            logger.info(f'Fetching new cert for {server_name}')
-            fetch_new_cert(server_name, output_path)

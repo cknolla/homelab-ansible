@@ -1,0 +1,66 @@
+- name: Install nginx
+  apt:
+    name: nginx
+    state: present
+
+- name: Inject site config
+  template:
+    src: nginx.j2
+    dest: "/etc/nginx/sites-available/{{ item.site_name }}.conf"
+    owner: root
+    group: root
+    mode: 0644
+  loop: "{{ sites }}"
+  notify: reload_nginx
+
+- name: Create ssl directory
+  file:
+    path: "/etc/nginx/ssl"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  notify: restart_nginx
+
+- name: Create private ssl directory
+  file:
+    path: "/etc/nginx/ssl/private"
+    state: directory
+    owner: root
+    group: root
+    mode: 0700
+  notify: restart_nginx
+
+- name: Copy cert
+  copy:
+    src: "{{ item.site_name }}.{{ domain }}.pem"
+    dest: "/etc/nginx/ssl/{{ item.site_name }}.{{ domain }}.pem"
+    owner: root
+    group: root
+    mode: 0644
+  loop: "{{ sites }}"
+  notify: reload_nginx
+
+- name: Copy key
+  copy:
+    src: "{{ inventory_hostname }}.{{ domain }}.key"
+    dest: "/etc/nginx/ssl/private/{{ inventory_hostname }}.{{ domain }}.key"
+    owner: root
+    group: root
+    mode: 0600
+  loop: "{{ sites }}"
+  notify: reload_nginx
+
+- name: Enable site config
+  file:
+    src: "/etc/nginx/sites-available/{{ item.site_name }}.conf"
+    dest: "/etc/nginx/sites-enabled/{{ item.site_name }}.conf"
+    state: link
+  loop: "{{ sites }}"
+  notify: reload_nginx
+
+- name: Deactivate the default nginx site
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+  notify: reload_nginx

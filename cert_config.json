@@ -3,6 +3,7 @@
   "domain": "kansai",
   "ca_name": "kansaiCA.crt",
   "servers": {
-    "ansible": "certs"
+    "ansible": "certs",
+    "sab": "roles/proxy/files"
   }
 }

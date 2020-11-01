@@ -1,0 +1,2 @@
+sites:
+  - { "site_name": "sab", "proxy_pass": "http://ds1019.kansai:8090" }
