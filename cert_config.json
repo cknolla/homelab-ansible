@@ -3,6 +3,6 @@
   "domain": "kansai",
   "ca_name": "kansaiCA.crt",
   "servers": {
-    "ubuntu-test": "roles/apache/files"
+    "ansible": "certs"
   }
 }

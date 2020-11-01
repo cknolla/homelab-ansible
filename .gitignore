@@ -4,4 +4,5 @@ venv/
 *.key
 *.pem
 certs/*
+logs/*
 !.gitkeep
