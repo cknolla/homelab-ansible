@@ -7,8 +7,9 @@
     "ansible": "certs",
     "bookstack": "roles/apache/files",
     "radarr-web": "roles/proxy/files",
-    "sab": "roles/proxy/files",
-    "sonarr-web": "roles/proxy/files"
-
+    "sabnzbd-web": "roles/proxy/files",
+    "sonarr-web": "roles/proxy/files",
+    "tautulli-web": "roles/proxy/files",
+    "transmission-web": "roles/proxy/files"
   }
 }
