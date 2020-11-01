@@ -2,7 +2,6 @@
   roles:
     - bootstrap
 
-- hosts: all
-  become: true
-  roles:
-    - common
+- import_playbook: common.yml
+- import_playbook: proxy.yml
+- import_playbook: apache.yml

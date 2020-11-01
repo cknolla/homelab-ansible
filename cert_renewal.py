@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import json
 import logging
+from logging.handlers import RotatingFileHandler
 import os
 from datetime import datetime, timedelta
 
@@ -8,34 +9,33 @@ import requests
 import OpenSSL
 
 
-# set up logging to file - see previous section for more details
+# set up logging to console and a rotating logfile
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s %(levelname)s - %(message)s',
-                    datefmt='%m-%d %H:%M',
-                    filename='logs/log.log',
-                    filemode='w')
-# define a Handler which writes INFO messages or higher to the sys.stderr
-_console = logging.StreamHandler()
-_console.setLevel(logging.INFO)
-# set a format which is simpler for console use
-_formatter = logging.Formatter('%(levelname)s - %(message)s')
-# tell the handler to use this format
-_console.setFormatter(_formatter)
-# add the handler to the root logger
+                    datefmt='%Y-%m-%d %H:%M:%S',
+                    handlers=[
+                        RotatingFileHandler(
+                            f'logs/{__file__}.log',
+                            maxBytes=5000000,
+                            backupCount=5,
+                            encoding='utf-8',
+                        ),
+                        logging.StreamHandler(),
+                    ])
 LOGGER = logging.getLogger(__name__)
-LOGGER.addHandler(_console)
 LOGGER.info('Loading config file cert_config.json')
 with open('cert_config.json') as config_file:
     config = json.load(config_file)
+if config['testing']:
+    LOGGER.warning(f'Testing mode is enabled')
 SESSION = requests.Session()
 
 
 def cert_to_string(cert_path) -> str:
-    cert_string = ''
     with open(cert_path) as cert_file:
-        for line in cert_file:
-            cert_string += line
+        cert_string = ''.join(line for line in cert_file)
     return cert_string
+
 
 def get_vault_token() -> str:
     with SESSION.post(
@@ -47,6 +47,26 @@ def get_vault_token() -> str:
     ) as token_response:
         response_data = token_response.json()
         return response_data['auth']['client_token']
+
+
+def refresh_vault_cert(server_name: str, output_path: str) -> None:
+    LOGGER.info(f'Updating vault cert for {server_name}')
+    with SESSION.post(
+            f'{config["vault_addr"]}/v1/auth/cert/certs/{server_name}',
+            json={
+                'display_name': server_name,
+                'certificate': cert_to_string(os.path.join(output_path, f'{server_name}.{config["domain"]}.pem')),
+                'token_policies': [
+                    server_name,
+                    'cert-create',
+                ],
+                'token_ttl': '3600',
+            }
+    ) as vault_cert_refresh_response:
+        if vault_cert_refresh_response.status_code != 204:
+            LOGGER.error(f'Error updating {server_name} cert in vault!\n{vault_cert_refresh_response.json()}')
+        else:
+            LOGGER.info(f'Successfully refreshed {server_name} cert for TLS auth in vault')
 
 
 def get_needs_renewed(server_name: str, cert_path: str) -> bool:
@@ -61,19 +81,21 @@ def get_needs_renewed(server_name: str, cert_path: str) -> bool:
     if ttl < timedelta(days=30):
         LOGGER.info(f'{server_name} cert expires in {ttl}. Needs renewal')
         return True
-    LOGGER.info(f'{server_name} cert expires in {ttl}. Does not need renewal')
+    LOGGER.info(f'Skipping {server_name}. Cert expires in {ttl}.')
     return False
 
 
 def fetch_new_cert(server_name: str, output_path: str) -> None:
     key_path = os.path.join(output_path, f'{server_name}.{config["domain"]}.key')
     cert_path = os.path.join(output_path, f'{server_name}.{config["domain"]}.pem')
+    payload = {
+        'common_name': f'{server_name}.{config["domain"]}',
+    }
+    if config['testing']:
+        payload['ttl'] = '3600'  # make a short-lived cert
     with SESSION.post(
-        f'{config["vault_addr"]}/v1/pki/issue/kansai',
-        json={
-            'common_name': f'{server_name}.{config["domain"]}',
-            # 'ttl': '3600',
-        }
+        f'{config["vault_addr"]}/v1/pki/issue/{config["domain"]}',
+        json=payload,
     ) as cert_response:
         cert_response_data = cert_response.json()
         LOGGER.info(f'Generating cert for {server_name} in {output_path}')
@@ -86,20 +108,7 @@ def fetch_new_cert(server_name: str, output_path: str) -> None:
             pem_file.write('\n'.join(cert for cert in cert_chain))
         os.chmod(cert_path, 0o644)
     if server_name == 'ansible':
-        LOGGER.info('Updating vault cert for ansible')
-        with SESSION.post(
-            f'{config["vault_addr"]}/v1/auth/cert/certs/ansible',
-            json={
-                'display_name': 'ansible',
-                'token_policies': 'ansible,cert-create',
-                'certificate': cert_to_string(os.path.join(output_path, f'{server_name}.{config["domain"]}.pem')),
-                'token_ttl': '3600',
-            }
-        ) as ansible_cert_response:
-            if ansible_cert_response.status_code != 204:
-                LOGGER.error(f'Error updating ansible cert in vault!: {ansible_cert_response.json()}')
-            else:
-                LOGGER.info(f'Successfully refreshed ansible cert for TLS auth in vault')
+        refresh_vault_cert(server_name, output_path)
 
 
 def main():

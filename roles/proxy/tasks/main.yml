@@ -3,6 +3,13 @@
     name: nginx
     state: present
 
+- name: Create dhparam if not exists
+  command: "openssl dhparam -out {{ nginx_dhparam_path }} 2048"
+  args:
+    creates: "{{ nginx_dhparam_path }}"
+  when: nginx_dhparam_path is defined and nginx_dhparam_path
+  notify: restart_nginx
+
 - name: Inject site config
   template:
     src: nginx.j2
@@ -43,8 +50,8 @@
 
 - name: Copy key
   copy:
-    src: "{{ inventory_hostname }}.{{ domain }}.key"
-    dest: "/etc/nginx/ssl/private/{{ inventory_hostname }}.{{ domain }}.key"
+    src: "{{ item.site_name }}.{{ domain }}.key"
+    dest: "/etc/nginx/ssl/private/{{ item.site_name }}.{{ domain }}.key"
     owner: root
     group: root
     mode: 0600
@@ -64,3 +71,9 @@
     path: /etc/nginx/sites-enabled/default
     state: absent
   notify: reload_nginx
+
+- name: Ensure nginx is started and enabled
+  service:
+    name: nginx
+    state: started
+    enabled: yes

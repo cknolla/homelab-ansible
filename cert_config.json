@@ -1,9 +1,14 @@
 {
+  "testing": false,
   "vault_addr": "https://vault.kansai:8200",
   "domain": "kansai",
   "ca_name": "kansaiCA.crt",
   "servers": {
     "ansible": "certs",
-    "sab": "roles/proxy/files"
+    "bookstack": "roles/apache/files",
+    "radarr-web": "roles/proxy/files",
+    "sab": "roles/proxy/files",
+    "sonarr-web": "roles/proxy/files"
+
   }
 }

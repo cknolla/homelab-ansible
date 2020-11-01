@@ -8,6 +8,7 @@ server {
     listen 443 ssl;
     server_name {{ item.site_name }}.{{ domain }};
 
+    ssl on;
     ssl_certificate /etc/nginx/ssl/{{ item.site_name }}.{{ domain }}.pem;
     ssl_certificate_key /etc/nginx/ssl/private/{{ item.site_name }}.{{ domain }}.key;
 

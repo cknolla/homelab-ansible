@@ -1,0 +1,4 @@
+- hosts: apache_servers
+  become: true
+  roles:
+    - apache
