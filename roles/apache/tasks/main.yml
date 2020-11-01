@@ -7,13 +7,13 @@
   apache2_module:
     name: rewrite
     state: present
-    notify: restart_apache
+  notify: restart_apache
 
 - name: Enable ssl
   apache2_module:
     name: ssl
     state: present
-    notify: restart_apache
+  notify: restart_apache
 
 - name: Inject site config
   template:
