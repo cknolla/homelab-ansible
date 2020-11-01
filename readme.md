@@ -2,18 +2,20 @@
 To automate the configuration of homelab servers
 
 # Overview
-1. Using `cert_renewal.py`, check for and renew server certs if less than threshold days till expiration via vault intermediate CA.
-1. Bootstrap freshly made servers to be accessible by ansible.
-1. Perform a set of common tasks that all servers should have.
-    - Create `casey` user and inject client pubkeys.
-    - Copy in profile files such as `.bash_aliases`.
-    - `apt update` and `apt upgrade-dist`.
-    - Install common packages.
-    - Copy homelab root CA and make it locally trusted.
+1. Using `cert_renewal.py`, check for and renew server certs if less than threshold days till expiration via vault intermediate CA
+1. Bootstrap freshly made servers to be accessible by ansible
+1. Perform a set of common tasks that all servers should have
+    - Create `casey` user and inject client pubkeys
+    - Copy in profile files such as `.bash_aliases`
+    - `apt update` and `apt upgrade-dist`
+    - Install common packages
+    - Copy homelab root CA and make it locally trusted
 1. Install and configure nginx on proxy machine
-    - Copy site config for each proxy destination
-    - Copy certs for each proxy destinations
-    - Enable site configs and disable default config
+    - For each proxy destination:
+        - Copy site config
+        - Copy cert
+        - Enable site config
+    -  Disable default config
 1. Install and configure apache servers
     - Similar to proxy playbook, but configure server per-host rather than via proxy
     
