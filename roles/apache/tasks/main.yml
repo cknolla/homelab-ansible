@@ -1,6 +1,6 @@
 - name: Install apache
   apt:
-    name: apache
+    name: apache2
     state: present
 
 - name: Enable mod_rewrite
