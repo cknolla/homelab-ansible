@@ -56,11 +56,15 @@
   notify: restart_apache
 
 - name: Enable site config
-  shell: "/usr/sbin/a2ensite {{ inventory_hostname }}.{{ domain }}.conf"
+  command: "/usr/sbin/a2ensite {{ inventory_hostname }}.{{ domain }}.conf"
+  args:
+    creates: "/etc/apache2/sites-enabled/{{ inventory_hostname }}.{{ domain }}.conf"
   notify: reload_apache
 
 - name: Disable default apache config
-  shell: /usr/sbin/a2dissite 000-default.conf
+  command: /usr/sbin/a2dissite 000-default.conf
+  args:
+    removes: "/etc/apache2/sites-enabled/000-default.conf"
   notify: reload_apache
 
 - name: Ensure apache is started and enabled
