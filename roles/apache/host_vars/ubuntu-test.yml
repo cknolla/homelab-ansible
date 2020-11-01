@@ -1,0 +1,4 @@
+server_name: ubuntu-test.kansai
+document_root: /var/www/
+cert_name: ubuntu-test.vault.pem
+key_name: ubuntu-test.vault.key

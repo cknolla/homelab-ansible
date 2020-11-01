@@ -20,6 +20,10 @@ production_machines:
     unifi:
     vault:
 
+apache_servers:
+  hosts:
+    bookstack:
+
 all:
   children:
     test_machines:
