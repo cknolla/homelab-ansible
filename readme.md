@@ -35,8 +35,9 @@ Domain and other cert renewal config can be done in `cert_config.json`
 1. `./run_ansible.sh playbooks/homelab.yml` on ansible host
 
 ## Add proxy destinations
-1. Add an entry to `servers` within `cert_config.json` with output to `roles/proxy/files`
+1. Add an entry to `server_certs` within `cert_config.json` with output to `roles/proxy/files`
 1. Add an entry to `sites` within `roles/proxy/defaults/main.yml`
+1. Add alias to DNS Resolver
 
 # Logging
 Logs are saved to `logs/`
