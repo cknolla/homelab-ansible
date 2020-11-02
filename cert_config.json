@@ -4,7 +4,7 @@
   "domain": "kansai",
   "ca_name": "kansaiCA.crt",
   "renewal_threshold_days": 30,
-  "servers": {
+  "server_certs": {
     "ansible": "certs",
     "arashiyama": "roles/proxmox/files",
     "bookstack": "roles/apache/files",

@@ -113,7 +113,7 @@ def fetch_new_cert(server_name: str, output_path: str) -> None:
 
 def main():
     vault_token = None
-    for server_name, output_path in config['servers'].items():
+    for server_name, output_path in config['server_certs'].items():
         LOGGER.info(f'Checking if {server_name} cert needs renewed')
         if get_needs_renewed(server_name, os.path.join(output_path, f'{server_name}.{config["domain"]}.pem')):
             if vault_token is None:
