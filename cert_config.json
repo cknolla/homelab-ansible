@@ -8,6 +8,7 @@
     "ansible": "certs",
     "arashiyama": "roles/proxmox/files",
     "bookstack": "roles/apache/files",
+    "gitea-web": "roles/proxy/files",
     "radarr-web": "roles/proxy/files",
     "sabnzbd-web": "roles/proxy/files",
     "sonarr-web": "roles/proxy/files",

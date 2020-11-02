@@ -1,5 +1,6 @@
 nginx_dhparam_path: /etc/ssl/certs/dhparam.pem
 sites:
+  - { "site_name": "gitea-web", "proxy_pass": "http://gitea.kansai:3000" }
   - { "site_name": "radarr-web", "proxy_pass": "http://radarr.kansai:7878" }
   - { "site_name": "sabnzbd-web", "proxy_pass": "http://ds1019.kansai:8090" }
   - { "site_name": "sonarr-web", "proxy_pass": "http://sonarr.kansai:8989" }
