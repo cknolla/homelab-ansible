@@ -6,11 +6,13 @@
   "renewal_threshold_days": 30,
   "servers": {
     "ansible": "certs",
+    "arashiyama": "roles/proxmox/files",
     "bookstack": "roles/apache/files",
     "radarr-web": "roles/proxy/files",
     "sabnzbd-web": "roles/proxy/files",
     "sonarr-web": "roles/proxy/files",
     "tautulli-web": "roles/proxy/files",
-    "transmission-web": "roles/proxy/files"
+    "transmission-web": "roles/proxy/files",
+    "wakayama": "roles/proxmox/files"
   }
 }
