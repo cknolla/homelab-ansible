@@ -1,0 +1,17 @@
+- name: Copy cert
+  copy:
+    src: "{{ inventory_hostname }}.{{ domain }}.pem"
+    dest: "/etc/pve/nodes/{{ inventory_hostname }}/pve-ssl.pem"
+    owner: root
+    group: www-data
+    mode: 0640
+  notify: restart_pveproxy
+
+- name: Copy key
+  copy:
+    src: "{{ inventory_hostname }}.{{ domain }}.key"
+    dest: "/etc/pve/nodes/{{ inventory_hostname }}/pve-ssl.key"
+    owner: root
+    group: www-data
+    mode: 0640
+  notify: restart_pveproxy
