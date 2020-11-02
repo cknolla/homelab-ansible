@@ -27,7 +27,7 @@ SECRET_DATA=$(curl \
 
 ansible-playbook \
 -e user_password="$SECRET_DATA" \
--e user_password_salt="$(sha256sum "certs/ansible.$DOMAIN.pem" | cut -d ' ' -f 1)" \
+-e user_password_salt="$(sha256sum "certs/ansible.$DOMAIN.key" | cut -d ' ' -f 1)" \
 "$PLAYBOOK"
 
 
