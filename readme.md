@@ -42,4 +42,3 @@ Domain and other cert renewal config can be done in `cert_config.json`
 # Logging
 Logs are saved to `logs/`
     
-
