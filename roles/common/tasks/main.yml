@@ -25,6 +25,7 @@
     - "{{ wsl_pubkey_path }}"
     - "{{ spectre_pop_pubkey_path }}"
     - "{{ yubikey_pubkey_path }}"
+    - "{{ galago_pro_pubkey_path }}"
 
 # Configure user environment as desired
 - name: Copy .bash_aliases
