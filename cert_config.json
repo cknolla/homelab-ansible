@@ -1,8 +1,19 @@
 {
+  "testing": false,
   "vault_addr": "https://vault.kansai:8200",
   "domain": "kansai",
   "ca_name": "kansaiCA.crt",
-  "servers": {
-    "ubuntu-test": "roles/apache/files"
+  "renewal_threshold_days": 30,
+  "server_certs": {
+    "ansible": "certs",
+    "arashiyama": "roles/proxmox/files",
+    "bookstack": "roles/apache/files",
+    "gitea-web": "roles/proxy/files",
+    "radarr-web": "roles/proxy/files",
+    "sabnzbd-web": "roles/proxy/files",
+    "sonarr-web": "roles/proxy/files",
+    "tautulli-web": "roles/proxy/files",
+    "transmission-web": "roles/proxy/files",
+    "wakayama": "roles/proxmox/files"
   }
 }

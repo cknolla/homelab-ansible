@@ -1,0 +1,2 @@
+# run at 3:30am on Monday each week
+30  3   *   *   1   cd /home/ansible/homelab-ansible && ./run_ansible.sh

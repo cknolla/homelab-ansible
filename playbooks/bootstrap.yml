@@ -1,0 +1,4 @@
+- hosts: new_machines
+  become: true
+  roles:
+    - bootstrap

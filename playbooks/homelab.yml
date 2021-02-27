@@ -1,8 +1,6 @@
-- hosts: new_machines
-  roles:
-    - bootstrap
-
-- hosts: all
-  become: true
-  roles:
-    - common
+- import_playbook: ansible-logging.yml
+- import_playbook: bootstrap.yml
+- import_playbook: common.yml
+- import_playbook: proxmox.yml
+- import_playbook: proxy.yml
+- import_playbook: apache.yml

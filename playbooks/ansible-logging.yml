@@ -1,0 +1,12 @@
+- name: Set up rotating ansible log
+  hosts: ansible
+  become: true
+  tasks:
+    - name: Copy ansible rotating log config
+      template:
+        src: ansible_logs
+        dest: /etc/logrotate.d/ansible
+        owner: root
+        group: root
+        mode: 0644
+

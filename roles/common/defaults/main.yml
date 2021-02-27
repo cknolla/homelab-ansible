@@ -4,3 +4,4 @@ user_name: casey
 user_group: casey
 wsl_pubkey_path: "wsl.pub"
 spectre_pop_pubkey_path: "spectre-pop.pub"
+yubikey_pubkey_path: "yubikey.pub"

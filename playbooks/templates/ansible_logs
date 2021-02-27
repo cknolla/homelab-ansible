@@ -1,0 +1,10 @@
+{{ playbook_dir | dirname }}/logs/ansible.log {
+        su {{ ansible_user }} {{ ansible_user }}
+        weekly
+        missingok
+        rotate 4
+        size 10M
+        compress
+        delaycompress
+        create 644 {{ ansible_user }} {{ ansible_user }}
+}

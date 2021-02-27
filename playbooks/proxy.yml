@@ -1,0 +1,4 @@
+- hosts: proxy
+  become: true
+  roles:
+    - proxy

@@ -6,6 +6,11 @@ test_machines:
   hosts:
     ubuntu-test:
 
+hypervisors:
+  hosts:
+    wakayama:
+    arashiyama:
+
 production_machines:
   hosts:
     ansible:
@@ -14,11 +19,14 @@ production_machines:
     ombi:
     nginx:
     plex:
+    proxy:
     radarr:
     sonarr:
     tautulli:
     unifi:
     vault:
+  children:
+    hypervisors:
 
 apache_servers:
   hosts:

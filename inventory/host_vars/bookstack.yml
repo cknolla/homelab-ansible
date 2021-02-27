@@ -1,4 +1,1 @@
-server_name: bookstack.kansai
 document_root: /var/www/bookstack/public/
-cert_name: bookstack.vault.pem
-key_name: bookstack.vault.key
