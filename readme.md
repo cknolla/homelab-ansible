@@ -18,6 +18,9 @@ To automate the configuration of homelab servers
     -  Disable default config
 1. Install and configure apache servers
     - Similar to proxy playbook, but configure server per-host rather than via proxy
+1. Install and configure docker
+    - For `docker_servers` hosts, install the docker engine and `docker-compose`.
+    - Add users to docker groups as necessary
     
 # Pre-requisites
 - Root CA must be generated
