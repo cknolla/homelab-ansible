@@ -4,3 +4,4 @@
 - import_playbook: proxmox.yml
 - import_playbook: proxy.yml
 - import_playbook: apache.yml
+- import_playbook: docker.yml

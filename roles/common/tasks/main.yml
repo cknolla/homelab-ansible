@@ -1,8 +1,11 @@
 # Create local user
-- name: Create casey group
+- name: Create groups
   group:
-    name: "{{ user_group }}"
+    name: "{{ item  }}"
     state: present
+  with_items:
+    - "{{ user_group }}"
+    - docker
 
 - name: Create casey user
   user:
@@ -14,6 +17,7 @@
     group: "{{ user_group }}"
     groups:
       - sudo
+      - docker
     state: present
 
 - name: Inject SSH keys
@@ -26,6 +30,7 @@
     - "{{ spectre_pop_pubkey_path }}"
     - "{{ yubikey_pubkey_path }}"
     - "{{ galago_pro_pubkey_path }}"
+    - "{{ x570_pop_pubkey_path }}"
 
 # Configure user environment as desired
 - name: Copy .bash_aliases
@@ -49,6 +54,9 @@
      - "curl"
      - "jq"
      - "ca-certificates"
+     - "apt-transport-https"
+     - "gnupg-agent"
+     - "software-properties-common"
     state: present
 
 # Prep for installing local root CA

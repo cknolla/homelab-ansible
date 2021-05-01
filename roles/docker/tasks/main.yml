@@ -1,0 +1,45 @@
+# Docker-specific apt config
+- name: Add Docker repo key
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+
+- name: Add Docker apt repository for stable version
+  apt_repository:
+    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
+    state: present
+
+- name: Install Docker
+  apt:
+    name: "{{ packages }}"
+    state: present
+  vars:
+    packages:
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io
+
+- name: Add ansible_user to docker group
+  user:
+    name: "{{ ansible_user }}"
+    group: ansible
+    groups:
+     - docker
+    append: yes
+
+- name: Download docker-compose {{ docker_compose_version }} if it doesn't exist
+  get_url:
+    url: https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-Linux-x86_64
+    dest: ~/docker-compose
+    mode: '+x'
+  register: docker_compose_downloaded
+
+- name: Check if new docker-compose version exists
+  stat: path=~/docker-compose
+  register: docker_compose
+  when: docker_compose_downloaded.changed
+
+- name: Copy docker-compose to /usr/local/bin/docker-compose
+  command: cp ~/docker-compose /usr/local/bin/docker-compose
+  when: docker_compose_downloaded.changed and docker_compose.stat.exists
+
